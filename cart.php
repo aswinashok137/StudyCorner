@@ -47,13 +47,13 @@ include("functions/functions.php");
 
                     <ul id="branch">
 
-                    <?php getBranch() ?>
+                    <?php getBranch(); ?>
 
                     </ul>
 
                     <div id="sidebar_title">Semester</div>
                       <ul id="branch">
-                          <?php getSem() ?>
+                          <?php getSem(); ?>
                       </ul>
             </div>
 
@@ -68,83 +68,92 @@ include("functions/functions.php");
                   </span>
               </div>
               <?php echo $ip=getIp(); ?>
-
               <div id="books_box">
-                  <br>
-              <form action="" method="post" enctype="multipart/form-data">
+                <br>
+              <form  action="" method="post" enctype="multipart/form-data">
+                <table align="center" bgcolor="skyblue" width="700">
+                  <tr align="center">
+                    <td colspan="5"><h2>Cart</h2></td>
+                  </tr>
+                  <tr align="center">
+                    <th>Remove</th>
+                    <th>Product(S)</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                  </tr>
+                  <?php
+                  $total=0;
 
-              <table align="right" width="800" bgcolor="skyblue">
+                  global $con;
 
-                <tr align="center">
-                  <th>Remove</th>
-                  <th>Book(S)</th>
-                  <th>Quantity</th>
-                  <th>Total Price</th>
-                </tr>
+                  $ip=getIp();
 
-                <?php
+                  $sel_price="select * from cart where ip_add='$ip'";
 
-                $total=0;
+                  $run_price=mysqli_query($con, $sel_price);
 
-                global $con;
+                  while ($b_price=mysqli_fetch_array($run_price)) {
 
-                $ip=getIp();
+                    $buk_id=$b_price['b_id'];
 
-                $sel_price="select * from cart where ip_add='$ip'";
+                    $buk_price="select * from books where book_id='$buk_id'";
 
-                $run_price=mysqli_query($con, $sel_price);
+                    $run_buk_price=mysqli_query($con,$buk_price);
 
-                while ($b_price=mysqli_fetch_array($run_price)) {
+                    while ($bb_price=mysqli_fetch_array($run_buk_price)) {
 
-                  $buk_id=$b_price['b_id'];
+                      $book_price=array($bb_price['book_price']);
+                      $book_title=$bb_price['book_title'];
+                      $book_image=$bb_price['book_image'];
+                      $single_price=$bb_price['book_price'];
 
-                  $buk_price="select * from books where book_id='$buk_id'";
+                      $values=array_sum($book_price);
 
-                  $run_buk_price=mysqli_query($con,$buk_price);
+                      $total += $values;
+                    ?>
 
-                  while ($bb_price=mysqli_fetch_array($run_buk_price)) {
+                   <tr align="center">
+                     <td><input type="checkbox" name="remove[]" value="<?php echo $buk_id;?>"/></td>
+                     <td><?php echo $book_title; ?><br>
+                       <img src="admin_area/book_images/<?php echo $book_image;?>" width="60" height="60"/></td>
+                     <td><input type="text" size="4" name="qty"/></td>
+                     <td><?php echo  $single_price; ?></td>
+                   </tr>
 
-                    $book_price=array($bb_price['book_price']);
-
-                    $book_title=$bb_price['book_title'];
-
-                    $book_image=$bb_price['book_image'];
-
-                    $single_price=$bb_price['book_price'];
-
-                    $values=array_sum($book_price);
-
-                    $total += $values;
-
-                 ?>
-                 <tr align="center">
-                   <td><input type="checkbox" name="remove[]" value="<?php echo $buk_id;?>"/></td>
-                   <td><b><?php echo $book_title ?></b><br>
-                     <img src="admin_area/book_images/<?php echo $book_image;?>" width="60" height="60" />
-                   </td>
-                   <td><input type="text" size="4" name="qty" disabled=""></td>
-                   <td><?php echo $single_price;  ?></td>
-                 </tr>
 
                  <?php }} ?>
 
-                 <tr >
-                   <td colspan="4" align="right"><b>Sub Total:</b></td>
-                   <td><?php echo $total; ?> </td>
+                 <tr align="right">
+                   <td colspan="4"><b>SubTotal:</b></td>
+                   <td><?php echo $total ?></td>
                  </tr>
-
                  <tr align="center">
                    <td colspan="2"><input type="submit" name="update_cart" value="Update Cart"/></td>
-                   <td><input type="submit" name="continue" value="Continue Shopping"></td>
-                   <td><a href="checkout.php" style="text-decoration:none; color:black;"><button>Checkout</a></button></td>
+                   <td><input type="submit" name="continue" value="Continue Shopping"/></td>
+                   <td><button><a href="checkout.php" style="text-decoration:none;color:black;">checkout</a></button></td>
                  </tr>
+                </table>
+              </form>
 
-              </table>
+              <?php
+                global $con;
+              $ip=getIp();
+                if (isset($_POST['update_cart'])) {
+                  foreach ($_POST['remove'] as $remove_id) {
+                    $delete_book="delete from cart where b_id='$remove_id' AND ip_add='$ip'";
+                    $run_delete=mysqli_query($con,$delete_book);
 
+                    if ($run_delete) {
+                    echo "<script>window.open('cart.php','_self')</script>";
+                    }
+                  }
+                }
 
-            </form>
-           
+                if (isset($_POST['continue'])) {
+              echo "<script>window.open('index.php','_self')</script>";
+            }
 
+               ?>
               </div>
 
             </div>

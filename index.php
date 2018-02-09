@@ -47,13 +47,13 @@ include("functions/functions.php");
 
                     <ul id="branch">
 
-                    <?php getBranch() ?>
+                    <?php getBranch(); ?>
 
                     </ul>
 
                     <div id="sidebar_title">Semester</div>
                       <ul id="branch">
-                          <?php getSem() ?>
+                          <?php getSem(); ?>
                       </ul>
             </div>
 
